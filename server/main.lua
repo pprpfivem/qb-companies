@@ -1,8 +1,5 @@
-QBCore = nil
-TriggerEvent('QBCore:GetObject', function(obj) QBCore = obj end)
-
 Citizen.CreateThread(function()
-    QBCore.Functions.ExecuteSql(false, "SELECT * FROM `companies`", function(result)
+    exports.ghmattimysql:execute("SELECT * FROM `companies`", function(result)
         if result[1] ~= nil then
             for k, v in pairs(result) do
                 Config.Companies[v.name] = {
@@ -38,7 +35,7 @@ AddEventHandler('qb-companies:server:createCompany', function(name)
                 if IsNameAvailable(companyName) then
                     if cashAmount >= Config.CompanyPrice then
                         Player.Functions.RemoveMoney("cash", Config.CompanyPrice, "company-created")
-                        QBCore.Functions.ExecuteSql(false, "INSERT INTO `companies` (`name`, `label`, `owner`) VALUES ('"..companyName.."', '"..companyLabel.."', '"..Player.PlayerData.citizenid.."')")
+                        exports.ghmattimysql:execute("INSERT INTO `companies` (`name`, `label`, `owner`) VALUES ('"..companyName.."', '"..companyLabel.."', '"..Player.PlayerData.citizenid.."')")
                         Config.Companies[companyName] = {
                             name = companyName,
                             label = name,
@@ -50,7 +47,7 @@ AddEventHandler('qb-companies:server:createCompany', function(name)
                         TriggerClientEvent('QBCore:Notify', src, "Congratulations, you are the proud owner of: "..companyLabel)
                     else
                         Player.Functions.RemoveMoney("bank", Config.CompanyPrice, "company-created")
-                        QBCore.Functions.ExecuteSql(false, "INSERT INTO `companies` (`name`, `label`, `owner`) VALUES ('"..companyName.."', '"..companyLabel.."', '"..Player.PlayerData.citizenid.."')")
+                        exports.ghmattimysql:execute("INSERT INTO `companies` (`name`, `label`, `owner`) VALUES ('"..companyName.."', '"..companyLabel.."', '"..Player.PlayerData.citizenid.."')")
                         Config.Companies[companyName] = {
                             name = companyName,
                             label = name,
@@ -112,7 +109,7 @@ AddEventHandler('qb-companies:server:quitCompany', function(companyName)
             for employee, info in pairs(Config.Companies[companyName].employees) do
                 updatedEmployees[employee] = info
             end
-            QBCore.Functions.ExecuteSql(false, "UPDATE `companies` SET `employees` = '"..json.encode(updatedEmployees).."' WHERE `name` = '"..escapeSqli(companyName).."'")
+            exports.ghmattimysql:execute("UPDATE `companies` SET `employees` = '"..json.encode(updatedEmployees).."' WHERE `name` = '"..escapeSqli(companyName).."'")
         else
             TriggerClientEvent('QBCore:Notify', src, 'You do not own this business ..', 'error', 4000)
         end
@@ -135,7 +132,7 @@ AddEventHandler('qb-companies:server:addEmployee', function(playerCitizenId, com
                     citizenid = OtherPlayer.PlayerData.citizenid,
                     rank = rank,
                 }
-                QBCore.Functions.ExecuteSql(false, "UPDATE `companies` SET `employees` = '"..json.encode(Config.Companies[companyName].employees).."' WHERE `name` = '"..escapeSqli(companyName).."'")
+                exports.ghmattimysql:execute("UPDATE `companies` SET `employees` = '"..json.encode(Config.Companies[companyName].employees).."' WHERE `name` = '"..escapeSqli(companyName).."'")
                 TriggerClientEvent("qb-companies:client:setCompanies", -1, Config.Companies)
                 TriggerClientEvent('QBCore:Notify', src, 'You have ' .. OtherPlayer.PlayerData.firstname .. ' ' .. OtherPlayer.PlayerData.lastname .. ' added to employees (rank: '..rank..')')
                 TriggerClientEvent('QBCore:Notify', OtherPlayer.PlayerData.source, 'You have been added to company ' .. Config.Companies[companyName].label .. "(rank: " ..rank..")")
@@ -161,7 +158,7 @@ AddEventHandler('qb-companies:server:alterEmployee', function(playerCitizenId, c
                 local newRank = Config.Companies[companyName].employees[otherCitizenId].rank + 1
                 if newRank < Config.MaxRank then
                     Config.Companies[companyName].employees[otherCitizenId].rank = newRank
-                    QBCore.Functions.ExecuteSql(false, "UPDATE `companies` SET `employees` = '"..json.encode(Config.Companies[companyName].employees).."' WHERE `name` = '"..escapeSqli(companyName).."'")
+                    exports.ghmattimysql:execute("UPDATE `companies` SET `employees` = '"..json.encode(Config.Companies[companyName].employees).."' WHERE `name` = '"..escapeSqli(companyName).."'")
                     TriggerClientEvent("qb-companies:client:setCompanies", -1, Config.Companies)
                     TriggerClientEvent('QBCore:Notify', src, 'Werknemer rank geupdate naar: ' ..newRank)
                 else
@@ -171,7 +168,7 @@ AddEventHandler('qb-companies:server:alterEmployee', function(playerCitizenId, c
                 local newRank = Config.Companies[companyName].employees[otherCitizenId].rank - 1
                 if newRank > 0 then
                     Config.Companies[companyName].employees[otherCitizenId].rank = newRank
-                    QBCore.Functions.ExecuteSql(false, "UPDATE `companies` SET `employees` = '"..json.encode(Config.Companies[companyName].employees).."' WHERE `name` = '"..escapeSqli(companyName).."'")
+                    exports.ghmattimysql:execute("UPDATE `companies` SET `employees` = '"..json.encode(Config.Companies[companyName].employees).."' WHERE `name` = '"..escapeSqli(companyName).."'")
                     TriggerClientEvent("qb-companies:client:setCompanies", -1, Config.Companies)
                     TriggerClientEvent('QBCore:Notify', src, 'Employee rank updated to: ' ..newRank)
                 else

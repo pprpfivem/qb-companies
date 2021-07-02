@@ -1,12 +1,3 @@
-QBCore = nil
-
-Citizen.CreateThread(function()
-	while QBCore == nil do
-		TriggerEvent('QBCore:GetObject', function(obj) QBCore = obj end)
-		Citizen.Wait(10)
-	end
-end)
-
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded')
 AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
     TriggerServerEvent("qb-admin:server:loadCompanies")
